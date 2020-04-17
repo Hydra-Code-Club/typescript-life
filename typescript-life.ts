@@ -55,7 +55,7 @@ class Cell {
 
     getNextState(): boolean {
         // TODO: calculate next state
-        return false;
+        return Math.random() < 0.5;
     }
 }
 
@@ -68,4 +68,12 @@ function init(target): void {
 function update(target): void {
     world.update();
     init(target);
+}
+
+function autoupdate(target): void {
+    setTimeout(function () {
+        world.update();
+        init(target);
+        autoupdate(target);
+    }, 100);
 }
