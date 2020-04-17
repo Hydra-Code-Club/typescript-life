@@ -2,6 +2,16 @@
     <head>
         <title>Game of Life</title>
         <script type="application/javascript" src="typescript-life.js"></script>
+        <style>
+            html { font-size: 16px; }
+            body, textarea { font-size: 1rem; }
+            textarea {
+                padding: 0.5rem 0;
+                font-family: 'Courier New', Courier, monospace;
+                line-height: 0.7;
+                text-align: center;
+            }
+        </style>
     </head>
     <body onload="init('life');">
         <textarea rows="30" cols="80" id="life" onchange="updateWorldFromText('life')"></textarea><br />
