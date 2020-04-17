@@ -27,15 +27,27 @@ class World {
         this.cells = newCells;
     }
 
+    updateFromText(text: string): void {
+        var lines: string[] = text.split("\n");
+
+        for (var x: number = 0; x < this.height; x++) {
+            this.cells[x] = [];
+            for (var y: number = 0; y < this.width; y++) {
+                var alive: boolean = (typeof lines[x] !== "undefined")
+                    && lines[x].substr(y, 1) == "x";
+                this.cells[x][y] = new Cell(x, y, alive, this);
+            }
+        }
+    }
+
     asHtml(): string {
-        var html: string = "<tt>";
+        var html: string = "";
         for (var x: number = 0; x < this.height; x++) {
             for (var y: number = 0; y < this.width; y++) {
-                html += this.cells[x][y].alive ? 'x' : '&nbsp;';
+                html += this.cells[x][y].alive ? 'x' : ' ';
             }
-            html += '<br />';
+            html += "\n";
         }
-        html += "</tt>";
         return html;
     }
 }
@@ -53,16 +65,39 @@ class Cell {
         this.world = world;
     }
 
+    hasNeighborAtDelta(deltaX, deltaY): boolean {
+        if (deltaX == 0 && deltaY == 0) {
+            return false;
+        }
+        if (typeof this.world.cells[this.x + deltaX] !== "undefined"
+            && typeof this.world.cells[this.x + deltaX][this.y + deltaY] !== "undefined"
+        ) {
+            return this.world.cells[this.x + deltaX][this.y + deltaY].alive;
+        }
+        return false;
+    }
+
     getNextState(): boolean {
-        // TODO: calculate next state
-        return Math.random() < 0.5;
+        var neighbors: number = 0;
+        for (var deltaX: number = -1; deltaX <= 1; deltaX++) {
+            for (var deltaY: number = -1; deltaY <= 1; deltaY++) {
+                neighbors += this.hasNeighborAtDelta(deltaX, deltaY) ? 1 : 0;
+            }
+        }
+        return ((this.alive && neighbors == 2) || neighbors == 3);
     }
 }
 
-var world: World = new World(80, 25);
+var world: World = new World(80, 30);
+
+var timer: any;
 
 function init(target): void {
-    document.getElementById(target).innerHTML = world.asHtml();
+    (<HTMLTextAreaElement>document.getElementById(target)).value = world.asHtml();
+}
+
+function updateWorldFromText(target): void {
+    world.updateFromText((<HTMLTextAreaElement>document.getElementById(target)).value);
 }
 
 function update(target): void {
@@ -71,9 +106,13 @@ function update(target): void {
 }
 
 function autoupdate(target): void {
-    setTimeout(function () {
+    timer = setTimeout(function () {
         world.update();
         init(target);
         autoupdate(target);
     }, 100);
+}
+
+function stopupdate(): void {
+    clearTimeout(timer);
 }

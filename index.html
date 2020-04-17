@@ -4,8 +4,9 @@
         <script type="application/javascript" src="typescript-life.js"></script>
     </head>
     <body onload="init('life');">
-        <div id="life"></div>
+        <textarea rows="30" cols="80" id="life" onchange="updateWorldFromText('life')"></textarea><br />
         <button onclick="update('life');">Single Update</button>
-        <button onclick="autoupdate('life');">Auto Update</button>
+        <button onclick="autoupdate('life');">Start</button>
+        <button onclick="stopupdate('life');">Stop</button>
     </body>
 </html>
