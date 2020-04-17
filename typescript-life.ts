@@ -1,9 +1,11 @@
 class World {
+    el: HTMLTextAreaElement;
     cells: Cell[][];
     width: number;
     height: number;
 
-    constructor(width: number, height: number) {
+    constructor(elID: string, width: number, height: number) {
+        this.el = <HTMLTextAreaElement>document.getElementById(elID);
         this.width = width;
         this.height = height;
         this.cells = [];
@@ -40,15 +42,17 @@ class World {
         }
     }
 
-    asHtml(): string {
+    render(): void {
         var html: string = "";
         for (var x: number = 0; x < this.height; x++) {
             for (var y: number = 0; y < this.width; y++) {
                 html += this.cells[x][y].alive ? 'x' : ' ';
             }
-            html += "\n";
+            if (x < this.height - 1) {
+                html += "\n";
+            }
         }
-        return html;
+        this.el.value = html;
     }
 }
 
@@ -97,31 +101,63 @@ class Cell {
     }
 }
 
-var world: World = new World(80, 30);
+var world: World;
 
-var timer: any;
 
 function init(target): void {
-    (<HTMLTextAreaElement>document.getElementById(target)).value = world.asHtml();
+    world = new World(target, 80, 30);
+    stoploop();
+    world.render();
 }
 
 function updateWorldFromText(target): void {
     world.updateFromText((<HTMLTextAreaElement>document.getElementById(target)).value);
 }
 
-function update(target): void {
+function step(): void {
     world.update();
-    init(target);
+    world.render();
 }
 
-function autoupdate(target): void {
-    timer = setTimeout(function () {
-        world.update();
-        init(target);
-        autoupdate(target);
-    }, 100);
+var timer: any;
+var accumulator = 0;
+var fps = 10;
+var delta = 1E3 / fps;  // delta between performance.now timings (in ms)
+var last: number, now: number, dt: number;
+function loop() {
+  timer = requestAnimationFrame(loop);
+
+  now = window.performance.now();
+  dt = now - last;
+  last = now;
+
+  // prevent updating the game with a very large dt if the game were to lose focus
+  // and then regain focus later
+  if (dt > 1E3) {
+    return;
+  }
+
+  accumulator += dt;
+
+  while (accumulator >= delta) {
+    world.update();
+
+    accumulator -= delta;
+  }
+
+  world.render();
 }
 
-function stopupdate(): void {
-    clearTimeout(timer);
+function startloop() {
+    last = window.performance.now();
+    loop();
+}
+
+function adjustSpeed(_fps: number) {
+    fps = _fps;
+    delta = 1E3 / fps;
+}
+
+function stoploop(): void {
+    cancelAnimationFrame(timer);
 }
