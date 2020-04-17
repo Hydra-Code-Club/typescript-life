@@ -69,10 +69,24 @@ class Cell {
         if (deltaX == 0 && deltaY == 0) {
             return false;
         }
-        if (typeof this.world.cells[this.x + deltaX] !== "undefined"
-            && typeof this.world.cells[this.x + deltaX][this.y + deltaY] !== "undefined"
+        var newX: number = this.x + deltaX;
+        if (newX < 0) {
+            newX = this.world.height - 1;
+        }
+        if (newX >= this.world.height) {
+            newX = 0;
+        }
+        var newY: number = this.y + deltaY;
+        if (newY < 0) {
+            newY = this.world.width - 1;
+        }
+        if (newY >= this.world.width) {
+            newY = 0;
+        }
+        if (typeof this.world.cells[newX] !== "undefined"
+            && typeof this.world.cells[newX][newY] !== "undefined"
         ) {
-            return this.world.cells[this.x + deltaX][this.y + deltaY].alive;
+            return this.world.cells[newX][newY].alive;
         }
         return false;
     }
