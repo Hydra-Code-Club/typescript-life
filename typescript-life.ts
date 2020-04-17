@@ -83,12 +83,7 @@ class Cell {
         if (newY >= this.world.width) {
             newY = 0;
         }
-        if (typeof this.world.cells[newX] !== "undefined"
-            && typeof this.world.cells[newX][newY] !== "undefined"
-        ) {
-            return this.world.cells[newX][newY].alive;
-        }
-        return false;
+        return this.world.cells[newX][newY].alive;
     }
 
     getNextState(): boolean {
