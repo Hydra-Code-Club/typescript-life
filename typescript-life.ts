@@ -46,7 +46,9 @@ class World {
             for (var y: number = 0; y < this.width; y++) {
                 html += this.cells[x][y].alive ? 'x' : ' ';
             }
-            html += "\n";
+            if (x < this.height - 1) {
+                html += "\n";
+            }
         }
         return html;
     }
