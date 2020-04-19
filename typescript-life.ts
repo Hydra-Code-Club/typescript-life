@@ -7,21 +7,21 @@ class World {
         this.width = width;
         this.height = height;
         this.cells = [];
-        for (var y: number = 0; y < height; y++) {
-            this.cells[y] = [];
-            for (var x: number = 0; x < width; x++) {
+        for (var x: number = 0; x < width; x++) {
+            this.cells[x] = [];
+            for (var y: number = 0; y < height; y++) {
                 var alive: boolean = Math.random() < 0.5;
-                this.cells[y][x] = new Cell(x, y, alive, this);
+                this.cells[x][y] = new Cell(x, y, alive, this);
             }
         }
     }
 
     update(): void {
         var newCells: Cell[][] = [];
-        for (var y: number = 0; y < this.height; y++) {
-            newCells[y] = [];
-            for (var x: number = 0; x < this.width; x++) {
-                newCells[y][x] = new Cell(x, y, this.cells[y][x].getNextState(), this);
+        for (var x: number = 0; x < this.width; x++) {
+            newCells[x] = [];
+            for (var y: number = 0; y < this.height; y++) {
+                newCells[x][y] = new Cell(x, y, this.cells[x][y].getNextState(), this);
             }
         }
         this.cells = newCells;
@@ -31,11 +31,13 @@ class World {
         var lines: string[] = text.split("\n");
 
         for (var y: number = 0; y < this.height; y++) {
-            this.cells[y] = [];
             for (var x: number = 0; x < this.width; x++) {
                 var alive: boolean = (typeof lines[y] !== "undefined")
                     && lines[y].substr(x, 1) == "x";
-                this.cells[y][x] = new Cell(x, y, alive, this);
+                if (typeof this.cells[x] === "undefined") {
+                    this.cells[x] = [];
+                }
+                this.cells[x][y] = new Cell(x, y, alive, this);
             }
         }
     }
@@ -44,7 +46,7 @@ class World {
         var html: string = "";
         for (var y: number = 0; y < this.height; y++) {
             for (var x: number = 0; x < this.width; x++) {
-                html += this.cells[y][x].alive ? 'x' : ' ';
+                html += this.cells[x][y].alive ? 'x' : ' ';
             }
             if (y < this.height - 1) {
                 html += "\n";
@@ -73,7 +75,7 @@ class Cell {
         }
         var newX: number = (this.x + deltaX + this.world.width) % this.world.width;
         var newY: number = (this.y + deltaY + this.world.height) % this.world.height;
-        return this.world.cells[newY][newX].alive;
+        return this.world.cells[newX][newY].alive;
     }
 
     getNextState(): boolean {
