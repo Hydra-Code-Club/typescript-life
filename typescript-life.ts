@@ -6,40 +6,39 @@ class World {
     constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
-        this.cells = [];
-        for (var x: number = 0; x < width; x++) {
-            this.cells[x] = [];
-            for (var y: number = 0; y < height; y++) {
-                var alive: boolean = Math.random() < 0.5;
-                this.cells[x][y] = new Cell(x, y, alive, this);
+        this.cells = this.makeCellGrid(
+            function () {
+                return Math.random() < 0.5;
+            }
+        );
+    }
+
+    makeCellGrid(isAliveCallback: (x: number, y: number) => boolean): Cell[][] {
+        var grid: Cell[][] = [];
+        for (var x: number = 0; x < this.width; x++) {
+            grid[x] = [];
+            for (var y: number = 0; y < this.height; y++) {
+                grid[x][y] = new Cell(x, y, isAliveCallback(x, y), this);
             }
         }
+        return grid;
     }
 
     update(): void {
-        var newCells: Cell[][] = [];
-        for (var x: number = 0; x < this.width; x++) {
-            newCells[x] = [];
-            for (var y: number = 0; y < this.height; y++) {
-                newCells[x][y] = new Cell(x, y, this.cells[x][y].getNextState(), this);
-            }
-        }
-        this.cells = newCells;
+        this.cells = this.makeCellGrid(
+            (function (x, y) {
+                return this.cells[x][y].getNextState();
+            }).bind(this)
+        );
     }
 
     updateFromText(text: string): void {
         var lines: string[] = text.split("\n");
-
-        for (var y: number = 0; y < this.height; y++) {
-            for (var x: number = 0; x < this.width; x++) {
-                var alive: boolean = (typeof lines[y] !== "undefined")
-                    && lines[y].substr(x, 1) == "x";
-                if (typeof this.cells[x] === "undefined") {
-                    this.cells[x] = [];
-                }
-                this.cells[x][y] = new Cell(x, y, alive, this);
+        this.cells = this.makeCellGrid(
+            function (x, y) {
+                return typeof lines[y] !== "undefined" && lines[y].substr(x, 1) == "x";
             }
-        }
+        );
     }
 
     asHtml(): string {
