@@ -7,21 +7,21 @@ class World {
         this.width = width;
         this.height = height;
         this.cells = [];
-        for (var x: number = 0; x < height; x++) {
-            this.cells[x] = [];
-            for (var y: number = 0; y < width; y++) {
+        for (var y: number = 0; y < height; y++) {
+            this.cells[y] = [];
+            for (var x: number = 0; x < width; x++) {
                 var alive: boolean = Math.random() < 0.5;
-                this.cells[x][y] = new Cell(x, y, alive, this);
+                this.cells[y][x] = new Cell(x, y, alive, this);
             }
         }
     }
 
     update(): void {
         var newCells: Cell[][] = [];
-        for (var x: number = 0; x < this.height; x++) {
-            newCells[x] = [];
-            for (var y: number = 0; y < this.width; y++) {
-                newCells[x][y] = new Cell(x, y, this.cells[x][y].getNextState(), this);
+        for (var y: number = 0; y < this.height; y++) {
+            newCells[y] = [];
+            for (var x: number = 0; x < this.width; x++) {
+                newCells[y][x] = new Cell(x, y, this.cells[y][x].getNextState(), this);
             }
         }
         this.cells = newCells;
@@ -30,23 +30,23 @@ class World {
     updateFromText(text: string): void {
         var lines: string[] = text.split("\n");
 
-        for (var x: number = 0; x < this.height; x++) {
-            this.cells[x] = [];
-            for (var y: number = 0; y < this.width; y++) {
-                var alive: boolean = (typeof lines[x] !== "undefined")
-                    && lines[x].substr(y, 1) == "x";
-                this.cells[x][y] = new Cell(x, y, alive, this);
+        for (var y: number = 0; y < this.height; y++) {
+            this.cells[y] = [];
+            for (var x: number = 0; x < this.width; x++) {
+                var alive: boolean = (typeof lines[y] !== "undefined")
+                    && lines[y].substr(x, 1) == "x";
+                this.cells[y][x] = new Cell(x, y, alive, this);
             }
         }
     }
 
     asHtml(): string {
         var html: string = "";
-        for (var x: number = 0; x < this.height; x++) {
-            for (var y: number = 0; y < this.width; y++) {
-                html += this.cells[x][y].alive ? 'x' : ' ';
+        for (var y: number = 0; y < this.height; y++) {
+            for (var x: number = 0; x < this.width; x++) {
+                html += this.cells[y][x].alive ? 'x' : ' ';
             }
-            if (x < this.height - 1) {
+            if (y < this.height - 1) {
                 html += "\n";
             }
         }
@@ -71,21 +71,9 @@ class Cell {
         if (deltaX == 0 && deltaY == 0) {
             return false;
         }
-        var newX: number = this.x + deltaX;
-        if (newX < 0) {
-            newX = this.world.height - 1;
-        }
-        if (newX >= this.world.height) {
-            newX = 0;
-        }
-        var newY: number = this.y + deltaY;
-        if (newY < 0) {
-            newY = this.world.width - 1;
-        }
-        if (newY >= this.world.width) {
-            newY = 0;
-        }
-        return this.world.cells[newX][newY].alive;
+        var newX: number = (this.x + deltaX + this.world.width) % this.world.width;
+        var newY: number = (this.y + deltaY + this.world.height) % this.world.height;
+        return this.world.cells[newY][newX].alive;
     }
 
     getNextState(): boolean {
