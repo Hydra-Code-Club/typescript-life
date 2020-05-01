@@ -92,27 +92,29 @@ var world: World = new World(80, 30);
 
 var timer: any;
 
+var textarea: HTMLTextAreaElement;
+
 function init(target): void {
-    (<HTMLTextAreaElement>document.getElementById(target)).value = world.asHtml();
+    textarea = <HTMLTextAreaElement>document.getElementById(target);
+    textarea.value = world.asHtml();
 }
 
-function updateWorldFromText(target): void {
-    world.updateFromText((<HTMLTextAreaElement>document.getElementById(target)).value);
+function updateWorldFromText(): void {
+    world.updateFromText(textarea.value);
 }
 
-function update(target): void {
+function update(): void {
     world.update();
-    init(target);
+    textarea.value = world.asHtml();
 }
 
-function autoupdate(target): void {
-    timer = setTimeout(function () {
-        world.update();
-        init(target);
-        autoupdate(target);
-    }, 100);
+function autoupdate(): void {
+    timer = requestAnimationFrame(function () {
+        autoupdate();
+    });
+    update();
 }
 
 function stopupdate(): void {
-    clearTimeout(timer);
+    cancelAnimationFrame(timer);
 }
