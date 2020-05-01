@@ -38,9 +38,11 @@ class World {
 
     updateFromText(text: string): void {
         var lines: string[] = text.split("\n");
+        var emptyCells: string[] = [" ", ".", ""];
         this.cells = this.makeCellGrid(
             function (x, y) {
-                return typeof lines[y] !== "undefined" && lines[y].substr(x, 1) == "x";
+                return (typeof lines[y] !== "undefined")
+                    && (emptyCells.indexOf(lines[y].substr(x, 1)) === -1);
             }
         );
     }
