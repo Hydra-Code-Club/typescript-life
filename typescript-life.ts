@@ -2,10 +2,14 @@ class World {
     cells: Cell[][];
     width: number;
     height: number;
+    bornRule: number[];
+    sustainRule: number[];
 
     constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
+        this.bornRule = [3];
+        this.sustainRule = [2, 3];
         this.cells = this.makeCellGrid(
             function () {
                 return Math.random() < 0.5;
@@ -84,7 +88,8 @@ class Cell {
                 neighbors += this.hasNeighborAtDelta(deltaX, deltaY) ? 1 : 0;
             }
         }
-        return ((this.alive && neighbors == 2) || neighbors == 3);
+        return (this.alive && this.world.sustainRule.indexOf(neighbors) > -1)
+            || (!this.alive && this.world.bornRule.indexOf(neighbors) > -1);
     }
 }
 
