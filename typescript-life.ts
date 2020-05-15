@@ -95,14 +95,19 @@ class Cell {
     }
 }
 
-var world: World = new World(80, 30);
+var world: World;
 
 var timer: any;
 
 var textarea: HTMLTextAreaElement;
 
 function init(target): void {
+    var rows: number = parseInt((<HTMLInputElement>document.getElementById('rows')).value);
+    var cols: number = parseInt((<HTMLInputElement>document.getElementById('cols')).value);
+    world = new World(cols, rows)
     textarea = <HTMLTextAreaElement>document.getElementById(target);
+    textarea.rows = rows;
+    textarea.cols = cols;
     textarea.value = world.asHtml();
 }
 
