@@ -141,7 +141,8 @@ function init(target: string): void {
     var cols: number = parseInt((<HTMLInputElement>document.getElementById('cols')).value);
     updateCanvas = (<HTMLInputElement>document.getElementById('updateCanvas')).checked;
     updateText = (<HTMLInputElement>document.getElementById('updateText')).checked;
-    canvasScale = parseInt((<HTMLInputElement>document.getElementById('scale')).value);
+    var scaleSlider = (<HTMLInputElement>document.getElementById('scale'));
+    canvasScale = parseInt(scaleSlider.value);
     var bornRules: number[] = getRules('born');
     var sustainRules: number[] = getRules('sustain');
     world = new World(cols, rows)
@@ -154,6 +155,11 @@ function init(target: string): void {
     textarea.rows = rows;
     textarea.cols = cols;
     textarea.value = world.asHtml();
+
+    var scaleDisplay = <HTMLCanvasElement>document.getElementById('scale-display');
+    scaleSlider.addEventListener('input', function showSlideValue() {
+      scaleDisplay.innerText = scaleSlider.value;
+    }, { passive: true });
 }
 
 function updateWorldFromText(): void {

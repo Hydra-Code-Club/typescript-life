@@ -24,7 +24,10 @@
         <label>World Width: <input type="text" id="cols" value="80" /></label><br />
         <label>Born Rules: <input type="text" id="born" value="3" /></label><br />
         <label>Sustain Rules: <input type="text" id="sustain" value="2,3" /></label><br />
-        <label>Canvas Scale: <input type="range" id="scale" value="1" min="1" max="10" step="1" /></label><br />
+        <label>
+          Canvas Scale: <input type="range" id="scale" value="1" min="1" max="20" step="1" /></label>
+          x<span id="scale-display">1</span>
+        </label><br />
         <label><input type="checkbox" id="updateText" checked value="1" /> Update Text</label><br />
         <label><input type="checkbox" id="updateCanvas" checked value="1" /> Update Canvas</label><br />
         <button onclick="init('life');">Build New World</button>
