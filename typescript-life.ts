@@ -52,6 +52,18 @@ class World {
         );
     }
 
+    drawOnCanvas(pixels: CanvasRenderingContext2D) {
+        pixels.fillStyle = '#000';
+        pixels.clearRect(0, 0, this.width * canvasScale, this.height * canvasScale);
+        for (var y: number = 0; y < this.height; y++) {
+            for (var x: number = 0; x < this.width; x++) {
+                if (this.cells[x][y].alive) {
+                    pixels.fillRect(x * canvasScale, y * canvasScale, canvasScale, canvasScale);
+                }
+            }
+        }
+    }
+
     asHtml(): string {
         var html: string = "";
         for (var y: number = 0; y < this.height; y++) {
@@ -100,6 +112,14 @@ class Cell {
     }
 }
 
+var updateText: boolean;
+
+var updateCanvas: boolean;
+
+var canvasScale: number = 1;
+
+var pixels: CanvasRenderingContext2D;
+
 var world: World;
 
 var timer: any;
@@ -119,10 +139,17 @@ function getRules(target: string) {
 function init(target: string): void {
     var rows: number = parseInt((<HTMLInputElement>document.getElementById('rows')).value);
     var cols: number = parseInt((<HTMLInputElement>document.getElementById('cols')).value);
+    updateCanvas = (<HTMLInputElement>document.getElementById('updateCanvas')).checked;
+    updateText = (<HTMLInputElement>document.getElementById('updateText')).checked;
+    canvasScale = parseInt((<HTMLInputElement>document.getElementById('scale')).value);
     var bornRules: number[] = getRules('born');
     var sustainRules: number[] = getRules('sustain');
     world = new World(cols, rows)
     world.setRules(bornRules, sustainRules);
+    var canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById(target + "canvas");
+    canvas.width = cols * canvasScale;
+    canvas.height = rows * canvasScale;
+    pixels = canvas.getContext('2d')
     textarea = <HTMLTextAreaElement>document.getElementById(target);
     textarea.rows = rows;
     textarea.cols = cols;
@@ -135,7 +162,12 @@ function updateWorldFromText(): void {
 
 function update(): void {
     world.update();
-    textarea.value = world.asHtml();
+    if (updateText) {
+        textarea.value = world.asHtml();
+    }
+    if (updateCanvas) {
+        world.drawOnCanvas(pixels);
+    }
 }
 
 function autoupdate(): void {
