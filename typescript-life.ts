@@ -17,6 +17,11 @@ class World {
         );
     }
 
+    setRules(bornRule: number[], sustainRule: number[]) {
+        this.bornRule = bornRule;
+        this.sustainRule = sustainRule;
+    }
+
     makeCellGrid(isAliveCallback: (x: number, y: number) => boolean): Cell[][] {
         var grid: Cell[][] = [];
         for (var x: number = 0; x < this.width; x++) {
@@ -101,10 +106,23 @@ var timer: any;
 
 var textarea: HTMLTextAreaElement;
 
-function init(target): void {
+function getRules(target: string) {
+    var rawRules: string = (<HTMLInputElement>document.getElementById(target)).value;
+    var ruleParts: string[] = rawRules.split(',');
+    var rules: number[] = [];
+    for (var i: number = 0; i < ruleParts.length; i++) {
+        rules[rules.length] = parseInt(ruleParts[i]);
+    }
+    return rules;
+}
+
+function init(target: string): void {
     var rows: number = parseInt((<HTMLInputElement>document.getElementById('rows')).value);
     var cols: number = parseInt((<HTMLInputElement>document.getElementById('cols')).value);
+    var bornRules: number[] = getRules('born');
+    var sustainRules: number[] = getRules('sustain');
     world = new World(cols, rows)
+    world.setRules(bornRules, sustainRules);
     textarea = <HTMLTextAreaElement>document.getElementById(target);
     textarea.rows = rows;
     textarea.cols = cols;
